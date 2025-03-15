@@ -1,0 +1,59 @@
+services:
+  mininet:
+    image: mmwave-mininet
+    container_name: mininet
+    privileged: true
+    volumes:
+      - /lib/modules:/lib/modules
+    command: --controller remote,ip=ryu.mmwave-dashboard.orb.local --topo tree,depth=3
+    tty: true
+    stdin_open: true
+
+  ryu:
+    image: mmwave-ryu
+    container_name: ryu
+    command: simple_switch_13 ofctl_rest rest_topology
+    depends_on:
+      - mininet
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    depends_on:
+      - mongodb
+
+  middleware:
+    image: mmwave-middleware
+    container_name: middleware
+    environment:
+      - SDN_CONTROLLER_BASE_URL=http://ryu.mmwave-dashboard.orb.local:8080
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8800
+      - OPENAI_API_KEY=
+      - MONGODB_URI=mongodb://admin:admin@mongodb:27017/
+    depends_on:
+      - mongo-express
+
+  dashboard:
+    image: mmwave-dashboard
+    container_name: dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=mongodb://admin:admin@mongodb:27017/nodedatabase?schema=public
+      - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
+      - NEXT_PUBLIC_MMWAVE_MIDDLEWARE_URL=http://middleware.mmwave-dashboard.orb.local:8800
+    restart: unless-stopped
+    depends_on:
+      - middleware
