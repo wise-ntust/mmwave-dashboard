@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export const revalidate = 0;
 
-const PYTHON_API_BASE = "http://0.0.0.0:8800/api";
+const PYTHON_API_BASE = `${process.env.NEXT_PUBLIC_MMWAVE_MIDDLEWARE_URL}/api`;
 
 export async function GET(
   request: Request,
@@ -16,7 +16,7 @@ export async function GET(
       throw new Error(`獲取資料失敗: ${response.statusText}`);
     }
     const data = await response.json();
-    const switchData = data.switches.find((s: any) => s.id === id);
+    const switchData = data.switches.find((s: { id: string }) => s.id === id);
     if (!switchData) {
       throw new Error(`找不到交換機 ${id}`);
     }

@@ -4,14 +4,17 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const response = await fetch("http://0.0.0.0:8800/api/network/update", {
-      cache: "no-store",
-      headers: {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-      },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_MMWAVE_MIDDLEWARE_URL}/api/network/update`,
+      {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

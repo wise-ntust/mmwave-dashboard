@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export const revalidate = 0;
 
-const PYTHON_API_BASE = "http://0.0.0.0:8800/api";
+const PYTHON_API_BASE = `${process.env.NEXT_PUBLIC_MMWAVE_MIDDLEWARE_URL}/api`;
 
 export async function POST(
   request: Request,

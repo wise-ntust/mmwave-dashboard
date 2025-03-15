@@ -3,15 +3,18 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const response = await fetch("http://0.0.0.0:8800/api/process-request", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_input: body.message,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_MMWAVE_MIDDLEWARE_URL}/api/process-request`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_input: body.message,
+        }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("請求失敗");
